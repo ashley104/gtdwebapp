@@ -1,6 +1,21 @@
 import { Prisma, PrismaClient } from "@prisma/client";
 import { NextResponse, type NextRequest } from "next/server";
 
+const todos = [
+  {
+      title: 'Learn React',
+      completed: true
+  },
+  {
+      title: 'Learn TypeScript',
+      completed: false
+  },
+  {
+      title: 'Learn GraphQL',
+      completed: false
+  },
+]
+
 const handler = async (req: NextRequest, res: NextResponse) => {
   if (process.env.E2E !== "true") {
     throw new Error("This endpoint is only available in E2E mode");
@@ -16,7 +31,7 @@ const handler = async (req: NextRequest, res: NextResponse) => {
   }
 
   // seed users
-  await prisma.user.create({
+  /*await prisma.user.create({
     data: {
       id: "1",
       name: "Test User",
@@ -24,7 +39,18 @@ const handler = async (req: NextRequest, res: NextResponse) => {
       image: "image.png",
       emailVerified: new Date(),
     },
-  });
+  });*/
+
+  const user = await prisma.user.findFirst();
+  
+  for (const todo of todos) {
+    await prisma.todo.create({
+      data: {
+        ...todo,
+        userId: user.id,
+      },
+    });
+  }
 
   return NextResponse.json({
     message: "Database Seeded",
