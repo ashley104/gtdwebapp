@@ -1,48 +1,52 @@
-import { Prisma, PrismaClient } from "@prisma/client";
+import { Prisma, PrismaClient, type Todo } from "@prisma/client";
 import { NextResponse, type NextRequest } from "next/server";
 
 const todos = [
   {
-      title: 'Learn React',
-      completed: true
+    title: "Learn React",
+    done: true,
   },
   {
-      title: 'Learn TypeScript',
-      completed: false
+    title: "Learn TypeScript",
+    done: false,
   },
   {
-      title: 'Learn GraphQL',
-      completed: false
+    title: "Learn GraphQL",
+    done: false,
   },
-]
+];
 
 const handler = async (req: NextRequest, res: NextResponse) => {
-  if (process.env.E2E !== "true") {
-    throw new Error("This endpoint is only available in E2E mode");
-  }
+  // if (process.env.E2E !== "true") {
+  //   throw new Error("This endpoint is only available in E2E mode");
+  // }
 
   const prisma = new PrismaClient();
 
   // erase every single table
-  const modelNames = Prisma.dmmf.datamodel.models.map((model) => model.name);
-  for (const modelName of modelNames) {
-    // handle async stuff
-    await (prisma as Any)[modelName].deleteMany();
-  }
+  // const modelNames = Prisma.dmmf.datamodel.models.map((model) => model.name);
+  // for (const modelName of modelNames) {
+  //   // handle async stuff
+  //   await (prisma as Any)[modelName].deleteMany();
+  // }
 
   // seed users
-  /*await prisma.user.create({
-    data: {
-      id: "1",
-      name: "Test User",
-      email: "test@user.com",
-      image: "image.png",
-      emailVerified: new Date(),
-    },
-  });*/
+  // await prisma.user.create({
+  //   data: {
+  //     id: "1",
+  //     name: "Test User",
+  //     email: "test@user.com",
+  //     image: "image.png",
+  //     emailVerified: new Date(),
+  //   },
+  // });
 
+  // seed todos
   const user = await prisma.user.findFirst();
-  
+  if (user === null) {
+    throw new Error("No user found");
+  }
+
   for (const todo of todos) {
     await prisma.todo.create({
       data: {
